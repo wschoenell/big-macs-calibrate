@@ -1269,7 +1269,7 @@ def fit(table, input_info_unsorted, mag_locus,
                         print A_band.shape, good.shape
                         good_diff = good[:,0,i] + good[:,0,0]
                         print scipy.sum(good[:,0,i]), 'number of good measurements in band'
-                        diff = diff[good_diff == 2]
+                        diff = good_diff[good_diff == 2]
 
                         print key, len(diff)
                   
