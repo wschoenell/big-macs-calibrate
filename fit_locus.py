@@ -4,9 +4,6 @@
 if __name__ != '__main__':
     print 'importing modules'
     import os, re, string, pylab
-    import pyfits, random, scipy, commands, anydbm
-    from scipy import linalg
-    from scipy import optimize
     from glob import glob
     from copy import copy
     import utilities
@@ -34,7 +31,7 @@ def fix_kpno():
 
 
 def join_cats(cs,outputfile):
-    import pyfits
+    import astropy.io.fits as pyfits
     tables = {}
     i = 0
     cols = []
@@ -60,7 +57,7 @@ def join_cats(cs,outputfile):
     print cols
     print len(cols)
     hdu = pyfits.PrimaryHDU()
-    hduSTDTAB = pyfits.new_table(cols) 
+    hduSTDTAB = pyfits.TableHDU.from_columns(cols)
     hdulist = pyfits.HDUList([hdu])
     hdulist.append(hduSTDTAB)
     hdulist[1].header.update('EXTNAME','STDTAB')
@@ -71,7 +68,8 @@ def join_cats(cs,outputfile):
 
 def get_survey_stars(inputcat, racol, deccol, necessary_columns, EBV, survey='SDSS', sdssUnit=False): 
 
-    import scipy, pyfits, math
+    import scipy
+    import astropy.io.fits as pyfits
 
     RA, DEC, RADIUS = get_catalog_parameters(inputcat, racol, deccol) 
 
@@ -187,7 +185,7 @@ def get_survey_stars(inputcat, racol, deccol, necessary_columns, EBV, survey='SD
                 cols.append(pyfits.Column(name=column_name,format='1E',array=scipy.array(catalogStars[column_name])))
 
             coldefs = pyfits.ColDefs(cols)
-            hdu_new = pyfits.new_table(coldefs)
+            hdu_new = pyfits.TableHDU.from_columns(coldefs)
 
             returnCat = hdu_new
 
@@ -221,7 +219,7 @@ def get_survey_stars(inputcat, racol, deccol, necessary_columns, EBV, survey='SD
                 cols.append(pyfits.Column(name=column_name,format='1E',array=array))
 
             coldefs = pyfits.ColDefs(cols)
-            hdu_new = pyfits.new_table(coldefs)
+            hdu_new = pyfits.TableHDU.from_columns(coldefs)
 
             matchedStars = 0
 
@@ -358,7 +356,7 @@ def update_database(ebv,extinction_info,gallat,results,zps_dict_all,snpath,run,n
 def galactic_extinction_and_coordinates(RA,DEC): 
     
         print 'RETRIEVING DUST EXTINCTION AT RA=' + str(RA) + ' DEC=' + str(DEC) + ' FROM NED'
-        import urllib, os, re, string, anydbm, time 
+        import urllib, re, string
         form = range(8) 
         form[0] = "in_csys=Equatorial"
         form[1] = "in_equinox=J2000.0" 
@@ -625,7 +623,7 @@ def run(file,columns_description,output_directory=None,plots_directory=None,exte
         cols.append(pyfits.Column(name='SeqNr',format='J',array=scipy.arange(len(fulltable.data))))
         hdu = pyfits.PrimaryHDU()
         hdulist = pyfits.HDUList([hdu])
-        fulltable = pyfits.new_table(cols)
+        fulltable = pyfits.TableHDU.from_columns(cols)
 
     table = fulltable.data 
 
@@ -811,7 +809,7 @@ def fit(table, input_info_unsorted, mag_locus,
               'scatter.s' : 0.1,
                 'scatter.marker': 'o',
               'figure.figsize' : fig_size}
-    pylab.rcParams.update(params_pylab)
+    # pylab.rcParams.update(params_pylab)
 
 
     if live_plot: 
@@ -1195,7 +1193,7 @@ def fit(table, input_info_unsorted, mag_locus,
 
                         if len(x_color):
                             pylab.scatter(x_color,y_color,color='#0066ff',s=4,marker='o', zorder=20)
-                            pylab.errorbar(x_color,y_color,xerr=x_err,yerr=y_err,marker=None,fmt=None,ecolor="#e8e8e8",ms=1, mew=1, zorder=1) #,mc='none')   
+                            # pylab.errorbar(x_color,y_color,xerr=x_err,yerr=y_err,marker=None,fmt=None,ecolor="#e8e8e8",ms=1, mew=1, zorder=1) #,mc='none')
 
                             c1_locus = locus_matrix[0,:,ind(c1_band1)] - locus_matrix[0,:,ind(c1_band2)]
                             c2_locus = locus_matrix[0,:,ind(c2_band1)] - locus_matrix[0,:,ind(c2_band2)]
@@ -1351,7 +1349,7 @@ def fit(table, input_info_unsorted, mag_locus,
                 sdss_locus_matrix = sdss_locus_matrix[dist < 3]
                 SeqNr = SeqNr[dist < 3]
                 good = good[dist < 3]
-                residuals = residuals[dist < 3]
+                # residuals = residuals[dist < 3]
                 end_of_locus = end_of_locus[dist < 3]
                 sdss_mags = sdss_mags[dist < 3]
 
@@ -1506,9 +1504,7 @@ if __name__ == '__main__':
 
     print 'importing libraries'
     import os, re, string, pylab
-    import pyfits, random, scipy, commands, anydbm
-    from scipy import linalg
-    from scipy import optimize
+    import astropy.io.fits as pyfits, random, scipy
     from glob import glob
     from copy import copy
     import utilities
